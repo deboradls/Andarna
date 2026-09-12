@@ -1,0 +1,451 @@
+/* ========================================
+   PÁGINA
+======================================== */
+
+.loginPage {
+  min-height: 100vh;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  background-color: var(--color-blue-deep);
+}
+
+
+/* ========================================
+   BRAND SECTION
+======================================== */
+
+.brandSection {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 60px;
+
+  background:
+    radial-gradient(circle at 50% 45%,
+      rgba(207, 148, 54, 0.08),
+      transparent 45%),
+    var(--color-blue-deep);
+
+  overflow: hidden;
+}
+
+
+.brandContent {
+  position: relative;
+  z-index: 1;
+
+  text-align: center;
+}
+
+
+/* ========================================
+   LOGO
+======================================== */
+
+.logo {
+  font-family: var(--font-display);
+
+  font-size: 3.5rem;
+  font-weight: 600;
+
+  letter-spacing: 0.25em;
+
+  color: var(--color-gold);
+}
+
+.logoIcon {
+  width: 350px;
+  height: auto;
+
+  margin: 0 auto 20px;
+
+  object-fit: contain;
+}
+
+
+/* ========================================
+   SLOGAN
+======================================== */
+
+.slogan {
+  margin-top: 16px;
+
+  font-family: var(--font-body);
+
+  font-size: 1rem;
+  font-weight: 300;
+
+  letter-spacing: 0.08em;
+
+  color: var(--color-text-secondary);
+}
+
+
+/* ========================================
+   FORM SECTION
+======================================== */
+
+.formSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 60px;
+
+  background-color: var(--color-blue-night);
+}
+
+
+.formContainer {
+  width: 100%;
+  max-width: 420px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  margin: 4px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+
+  flex: 1;
+
+  height: 1px;
+
+  background-color: var(--color-border);
+}
+
+.divider span {
+  font-size: 0.75rem;
+
+  color: var(--color-text-muted);
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.08em;
+}
+
+
+.googleButton {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  padding: 13px 16px;
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+
+  background-color: transparent;
+
+  color: var(--color-text-primary);
+
+  font-weight: 500;
+
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+
+.googleButton:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+
+.googleIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 20px;
+  height: 20px;
+
+  font-size: 1rem;
+  font-weight: 700;
+
+  font-family: Arial, sans-serif;
+
+  color: #4285F4;
+}
+
+.error {
+  margin: -4px 0 0;
+
+  color: #e57373;
+
+  font-size: 0.8rem;
+}
+
+.loginButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+
+.header {
+  margin-bottom: 40px;
+}
+
+
+.header h2 {
+  font-family: var(--font-display);
+
+  font-size: 2rem;
+  font-weight: 600;
+
+  color: var(--color-text-primary);
+}
+
+
+.header p {
+  margin-top: 10px;
+
+  font-size: 0.95rem;
+
+  color: var(--color-text-secondary);
+}
+
+
+/* ========================================
+   FORM
+======================================== */
+
+.form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 24px;
+}
+
+
+/* ========================================
+   INPUT
+======================================== */
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  color: var(--color-text-primary);
+}
+
+
+.inputGroup input {
+  width: 100%;
+
+  padding: 14px 16px;
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+
+  outline: none;
+
+  background-color: var(--color-blue-deep);
+
+  color: var(--color-text-primary);
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+
+.inputGroup input::placeholder {
+  color: var(--color-text-muted);
+}
+
+
+.inputGroup input:focus {
+  border-color: var(--color-gold);
+
+  box-shadow:
+    0 0 0 3px rgba(207, 148, 54, 0.1);
+}
+
+
+/* ========================================
+   OPÇÕES
+======================================== */
+
+.formOptions {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  font-size: 0.8rem;
+}
+
+
+.remember {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: var(--color-text-secondary);
+
+  cursor: pointer;
+}
+
+
+.remember input {
+  accent-color: var(--color-gold);
+}
+
+
+.formOptions a {
+  color: var(--color-gold);
+
+  transition: color var(--transition-fast);
+}
+
+
+.formOptions a:hover {
+  color: var(--color-gold-light);
+}
+
+
+/* ========================================
+   BOTÃO
+======================================== */
+
+.loginButton {
+  width: 100%;
+
+  padding: 14px;
+
+  border-radius: var(--radius-md);
+
+  background-color: var(--color-gold);
+
+  color: var(--color-blue-deep);
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.08em;
+
+  transition:
+    background-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+
+.loginButton:hover {
+  background-color: var(--color-gold-light);
+
+  box-shadow: var(--shadow-gold);
+
+  transform: translateY(-1px);
+}
+
+
+.loginButton:active {
+  transform: translateY(0);
+}
+
+
+/* ========================================
+   CADASTRO
+======================================== */
+
+.registerText {
+  margin-top: 32px;
+
+  text-align: center;
+
+  font-size: 0.85rem;
+
+  color: var(--color-text-secondary);
+}
+
+
+.registerText button {
+  margin-left: 5px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--color-gold);
+
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.registerText button:hover {
+  color: var(--color-gold-light);
+}
+
+
+.registerText a:hover {
+  color: var(--color-gold-light);
+}
+
+
+/* ========================================
+   RESPONSIVIDADE
+======================================== */
+
+@media (max-width: 768px) {
+
+  .loginPage {
+    grid-template-columns: 1fr;
+  }
+
+
+  .brandSection {
+    min-height: 35vh;
+
+    padding: 40px;
+  }
+
+
+  .logo {
+    font-size: 2.5rem;
+  }
+
+
+  .formSection {
+    min-height: 65vh;
+
+    padding: 40px 24px;
+  }
+
+}

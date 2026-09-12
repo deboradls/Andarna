@@ -1,0 +1,306 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    width: 100%;
+    height: 72px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 32px;
+
+    box-sizing: border-box;
+
+    background-color: var(--color-blue-deep);
+
+    border-bottom: 1px solid rgba(207, 148, 54, 0.12);
+}
+
+
+/* ============================= */
+/* LOGO */
+/* ============================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    cursor: pointer;
+
+    flex-shrink: 0;
+}
+
+
+.logoIcon {
+    width: 38px;
+    height: 38px;
+
+    object-fit: contain;
+}
+
+
+.logoName {
+    font-family: var(--font-display);
+
+    font-size: 1.35rem;
+    font-weight: 600;
+
+    letter-spacing: 0.08em;
+
+    color: var(--color-gold);
+}
+
+
+/* ============================= */
+/* NAVEGAÇÃO */
+/* ============================= */
+
+.navigation {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    margin-left: 48px;
+}
+
+
+.navLink {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 9px 12px;
+
+    border: none;
+
+    background: transparent;
+
+    color: var(--color-text-secondary);
+
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    border-radius: var(--radius-sm);
+
+    transition:
+        color var(--transition-fast),
+        background-color var(--transition-fast);
+}
+
+
+.navLink:hover {
+    color: var(--color-text-primary);
+
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+
+.navLink.active {
+    color: var(--color-gold);
+}
+
+
+/* ============================= */
+/* DROPDOWNS */
+/* ============================= */
+
+.dropdownContainer {
+    position: relative;
+}
+
+
+.dropdownButton {
+    font-family: inherit;
+}
+
+
+.arrow {
+    font-size: 0.7rem;
+
+    transition: transform var(--transition-fast);
+}
+
+
+.arrowOpen {
+    transform: rotate(180deg);
+}
+
+
+.dropdown {
+    position: absolute;
+
+    top: calc(100% + 8px);
+    left: 0;
+
+    min-width: 190px;
+
+    padding: 8px;
+
+    background-color: var(--color-blue-night);
+
+    border: 1px solid rgba(207, 148, 54, 0.15);
+
+    border-radius: var(--radius-md);
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    padding: 10px 12px;
+
+    box-sizing: border-box;
+
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text-secondary);
+
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+
+    text-decoration: none;
+
+    transition:
+        color var(--transition-fast),
+        background-color var(--transition-fast);
+}
+
+
+.dropdownItem:hover {
+    color: var(--color-text-primary);
+
+    background-color: rgba(207, 148, 54, 0.08);
+}
+
+
+.dropdownItem span {
+    width: 20px;
+
+    text-align: center;
+}
+
+
+/* ============================= */
+/* USUÁRIO */
+/* ============================= */
+
+.userArea {
+    margin-left: auto;
+}
+
+
+.userButton {
+    width: 38px;
+    height: 38px;
+
+    padding: 0;
+
+    border: 1px solid rgba(207, 148, 54, 0.35);
+
+    border-radius: 50%;
+
+    background-color: var(--color-blue-night);
+
+    cursor: pointer;
+
+    transition:
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+
+.userButton:hover {
+    border-color: var(--color-gold);
+
+    transform: scale(1.04);
+}
+
+
+.userAvatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    color: var(--color-gold);
+
+    font-size: 0.85rem;
+}
+
+
+/* ============================= */
+/* RESPONSIVIDADE */
+/* ============================= */
+
+@media (max-width: 1000px) {
+
+    .navigation {
+        margin-left: 24px;
+
+        gap: 2px;
+    }
+
+    .navLink {
+        padding: 8px;
+
+        font-size: 0.82rem;
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    .navbar {
+        padding: 0 20px;
+    }
+
+    .logoName {
+        display: none;
+    }
+
+    .navigation {
+        margin-left: 20px;
+    }
+
+    .navLink {
+        font-size: 0.78rem;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .navbar {
+        height: 64px;
+        padding: 0 20px;
+    }
+
+    .logoName {
+        font-size: 1.2rem;
+    }
+
+}

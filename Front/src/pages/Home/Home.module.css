@@ -1,0 +1,28 @@
+.home {
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  background-color: var(--color-blue-deep);
+
+  text-align: center;
+}
+
+.home h1 {
+  font-family: var(--font-display);
+
+  color: var(--color-gold);
+
+  font-size: 2.5rem;
+}
+
+.home p {
+  color: var(--color-text-secondary);
+
+  font-family: var(--font-body);
+}

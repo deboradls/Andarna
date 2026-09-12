@@ -1,0 +1,254 @@
+.registerPage {
+    min-height: 100vh;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    background-color: var(--color-blue-deep);
+}
+
+
+.brandSection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--color-blue-deep);
+}
+
+
+.brandContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+}
+
+
+.logoIcon {
+    width: 350px;
+    height: auto;
+
+    margin-bottom: 12px;
+}
+
+
+.logo {
+    margin: 0;
+
+    font-family: var(--font-display);
+    font-size: 3rem;
+    letter-spacing: 0.08em;
+
+    color: var(--color-gold);
+}
+
+
+.slogan {
+    margin-top: 8px;
+
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+
+    color: var(--color-text-secondary);
+}
+
+
+.formSection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+
+    background-color: var(--color-blue-night);
+}
+
+
+.formContainer {
+    width: 100%;
+    max-width: 420px;
+}
+
+
+.header {
+    margin-bottom: 32px;
+}
+
+
+.header h2 {
+    margin: 0;
+
+    font-family: var(--font-display);
+    font-size: 2rem;
+
+    color: var(--color-text-primary);
+}
+
+
+.header p {
+    margin-top: 8px;
+
+    color: var(--color-text-secondary);
+
+    font-size: 0.9rem;
+}
+
+
+.form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.inputGroup label {
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    color: var(--color-text-primary);
+}
+
+
+.inputGroup input {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 13px 14px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background-color: transparent;
+
+    color: var(--color-text-primary);
+
+    outline: none;
+
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+
+.inputGroup input:focus {
+    border-color: var(--color-gold);
+
+    box-shadow: 0 0 0 2px rgba(207, 148, 54, 0.15);
+}
+
+
+.registerButton {
+    width: 100%;
+
+    padding: 13px 16px;
+
+    border: none;
+    border-radius: var(--radius-md);
+
+    background-color: var(--color-gold);
+
+    color: var(--color-blue-deep);
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+
+.registerButton:hover {
+    background-color: var(--color-gold-light);
+
+    transform: translateY(-1px);
+}
+
+
+.registerButton:disabled {
+    opacity: 0.7;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+.error {
+    margin: -8px 0 0;
+
+    color: #e57373;
+
+    font-size: 0.8rem;
+}
+
+
+.success {
+    margin: -8px 0 0;
+
+    color: #81c784;
+
+    font-size: 0.8rem;
+}
+
+
+.loginText {
+    margin-top: 24px;
+
+    text-align: center;
+
+    color: var(--color-text-secondary);
+
+    font-size: 0.85rem;
+}
+
+
+.loginText button {
+    margin-left: 5px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: var(--color-gold);
+
+    font: inherit;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.loginText button:hover {
+    color: var(--color-gold-light);
+}
+
+
+@media (max-width: 768px) {
+    .registerPage {
+        grid-template-columns: 1fr;
+    }
+
+    .brandSection {
+        display: none;
+    }
+
+    .formSection {
+        padding: 24px;
+    }
+}
