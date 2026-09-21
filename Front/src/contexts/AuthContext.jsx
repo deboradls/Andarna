@@ -1,52 +1,24 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../services/supabase';
+import { authApi } from '../services/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verifica se já existe uma sessão ao abrir a aplicação
-    const getInitialSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-
-      if (error) {
-        console.error('Erro ao recuperar sessão:', error);
-      }
-
-      setSession(data.session);
-      setLoading(false);
-    };
-
-    getInitialSession();
-
-    // Observa mudanças na autenticação
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
-        setSession(newSession);
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    authApi.me().then(({ user: currentUser }) => setUser(currentUser)).catch(() => setUser(null)).finally(() => setLoading(false));
   }, []);
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      console.error('Erro ao sair:', error);
-    }
+    await authApi.logout();
+    setUser(null);
   };
 
   const value = {
-    session,
-    user: session?.user ?? null,
+    user,
+    setUser,
     loading,
     logout,
   };

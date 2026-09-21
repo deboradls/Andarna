@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 import styles from './Navbar.module.css';
 import logo from '../../assets/logo/logo_andarna.png';
@@ -8,6 +9,8 @@ function Navbar() {
     const [openMenu, setOpenMenu] = useState(null);
 
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const avatarInitial = (user?.name || user?.email || '?').charAt(0).toUpperCase();
 
     const toggleMenu = (menu) => {
         setOpenMenu(openMenu === menu ? null : menu);
@@ -57,23 +60,22 @@ function Navbar() {
 
                     <button
                         className={`${styles.navLink} ${styles.dropdownButton}`}
-                        onClick={() => toggleMenu('shelves')}
+                        onClick={() => navigate('/shelves/books')}
                     >
                         Estantes
 
-                        <span
-                            className={`${styles.arrow} ${
-                                openMenu === 'shelves'
-                                    ? styles.arrowOpen
-                                    : ''
-                            }`}
+                        {/* <span
+                            className={`${styles.arrow} ${openMenu === 'shelves'
+                                ? styles.arrowOpen
+                                : ''
+                                }`}
                         >
                             ▾
-                        </span>
+                        </span> */}
                     </button>
 
 
-                    {openMenu === 'shelves' && (
+                    {/* {openMenu === 'shelves' && (
                         <div className={styles.dropdown}>
 
                             <NavLink
@@ -95,7 +97,7 @@ function Navbar() {
                             </NavLink>
 
                         </div>
-                    )}
+                    )} */}
 
                 </div>
 
@@ -110,11 +112,10 @@ function Navbar() {
                         Minha Jornada
 
                         <span
-                            className={`${styles.arrow} ${
-                                openMenu === 'journey'
-                                    ? styles.arrowOpen
-                                    : ''
-                            }`}
+                            className={`${styles.arrow} ${openMenu === 'journey'
+                                ? styles.arrowOpen
+                                : ''
+                                }`}
                         >
                             ▾
                         </span>
@@ -125,7 +126,7 @@ function Navbar() {
                         <div className={styles.dropdown}>
 
                             <NavLink
-                                to="/journey/read"
+                            to="/shelves/books?status=read"
                                 className={styles.dropdownItem}
                                 onClick={closeMenu}
                             >
@@ -134,7 +135,7 @@ function Navbar() {
                             </NavLink>
 
                             <NavLink
-                                to="/journey/reading"
+                            to="/shelves/books?status=reading"
                                 className={styles.dropdownItem}
                                 onClick={closeMenu}
                             >
@@ -143,7 +144,7 @@ function Navbar() {
                             </NavLink>
 
                             <NavLink
-                                to="/journey/want-to-read"
+                            to="/shelves/books?status=want_to_read"
                                 className={styles.dropdownItem}
                                 onClick={closeMenu}
                             >
@@ -152,7 +153,7 @@ function Navbar() {
                             </NavLink>
 
                             <NavLink
-                                to="/journey/abandoned"
+                            to="/shelves/books?status=abandoned"
                                 className={styles.dropdownItem}
                                 onClick={closeMenu}
                             >
@@ -198,18 +199,6 @@ function Navbar() {
                     Catálogo
                 </NavLink>
 
-
-                {/* Perfil */}
-                <NavLink
-                    to="/profile"
-                    className={({ isActive }) =>
-                        `${styles.navLink} ${isActive ? styles.active : ''}`
-                    }
-                    onClick={closeMenu}
-                >
-                    Perfil
-                </NavLink>
-
             </div>
 
 
@@ -222,7 +211,7 @@ function Navbar() {
                     aria-label="Abrir perfil"
                 >
                     <span className={styles.userAvatar}>
-                        ?
+                        {avatarInitial}
                     </span>
                 </button>
 

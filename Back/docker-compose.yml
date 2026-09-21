@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: andarna-postgres
+    environment:
+      POSTGRES_DB: andarna
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - andarna_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  andarna_postgres_data:

@@ -6,6 +6,8 @@ Front/dist/
 Back/venv/
 Back/__pycache__/
 Back/*.pyc
+Back/node_modules/
+Back/dist/
 
 # Environment variables
 .env

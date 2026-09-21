@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import styles from './Login.module.css';
 import logo from '../../assets/logo/logo_andarna.png';
-import { supabase } from '../../services/supabase';
+import { authApi } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ function Login() {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const { setUser } = useAuth();
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -19,31 +21,19 @@ function Login() {
         setError('');
         setLoading(true);
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-
-        if (error) {
-            setError('E-mail ou senha incorretos.');
+        try {
+            const { user } = await authApi.login(email, password);
+            setUser(user);
+            navigate('/home');
+        } catch (requestError) {
+            setError(requestError.message);
+        } finally {
             setLoading(false);
-            return;
         }
-
-        navigate('/home');
     };
 
     const handleGoogleLogin = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: 'http://localhost:5173/home',
-            },
-        });
-
-        if (error) {
-            console.error('Erro ao fazer login com Google:', error);
-        }
+        authApi.googleLogin();
     };
 
     return (

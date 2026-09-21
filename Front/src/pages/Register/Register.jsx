@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import styles from './Register.module.css';
 import logo from '../../assets/logo/logo_andarna.png';
-import { supabase } from '../../services/supabase';
+import { authApi } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 function Register() {
     const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ function Register() {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const { setUser } = useAuth();
 
     const handleRegister = async (event) => {
         event.preventDefault();
@@ -27,34 +29,22 @@ function Register() {
             return;
         }
 
-        if (password.length < 6) {
-            setError('A senha deve ter pelo menos 6 caracteres.');
+        if (password.length < 8) {
+            setError('A senha deve ter pelo menos 8 caracteres.');
             return;
         }
 
         setLoading(true);
 
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-        });
-
-        if (error) {
-            setError(error.message);
-            setLoading(false);
-            return;
-        }
-
-        setLoading(false);
-
-        if (data.session) {
+        try {
+            const { user } = await authApi.register(email, password);
+            setUser(user);
             navigate('/home');
-            return;
+        } catch (requestError) {
+            setError(requestError.message);
+        } finally {
+            setLoading(false);
         }
-
-        setSuccess(
-            'Conta criada! Verifique seu e-mail para confirmar o cadastro.'
-        );
     };
 
     return (
