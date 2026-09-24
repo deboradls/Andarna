@@ -36,5 +36,5 @@ A plataforma busca permitir que os usuários:
 * 📊 Acompanhem sua jornada literária.
 
 ## Entregáveis
-Protótipos: https://www.figma.com/design/PcMFynhj30EwvXHzO5VGkQ/ANDARNA?node-id=0-1&t=Rduvig1Q8n4E6zZS-1
+Protótipos: https://www.figma.com/design/PcMFynhj30EwvXHzO5VGkQ/ANDARNA?node-id=0-1&t=Rduvig1Q8n4E6zZS-1 </br>
 Requisitos Ágeis: https://docs.google.com/document/d/1sn2PDpvMiKkfSSkdzYmMJ5L970mMaJg6/edit?usp=sharing&ouid=110889014359565880507&rtpof=true&sd=true
