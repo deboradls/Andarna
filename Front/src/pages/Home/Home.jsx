@@ -66,61 +66,102 @@ function Home() {
       <Navbar />
 
       <main className={styles.home}>
+        {/* ELEMENTOS DECORATIVOS */}
+        <div className={styles.ambientGlow} />
+        <div className={styles.starField}>
+          <span>✦</span>
+          <span>·</span>
+          <span>✧</span>
+          <span>·</span>
+          <span>✦</span>
+        </div>
+
         <div className={styles.container}>
-          {/* CABEÇALHO */}
-          <header className={styles.header}>
-            <div>
+          {/* HERO */}
+          <header className={styles.hero}>
+            <div className={styles.heroText}>
               <span className={styles.eyebrow}>
-                SEU CANTO DE LEITURA
+                ✦ DIÁRIO DE LEITURA
               </span>
 
               <h1>
-                O que está
-                <span> entre suas páginas?</span>
+                Entre páginas,
+                <span> novas jornadas.</span>
               </h1>
 
               <p>
-                Compartilhe sua jornada, descubra novas histórias e
-                acompanhe outros leitores.
+                Compartilhe o que está lendo, acompanhe seu progresso
+                e descubra as histórias que estão fazendo parte da
+                jornada de outros leitores.
               </p>
             </div>
 
-            <div className={styles.headerDecoration}>
-              <span>✦</span>
-              <span>✧</span>
-              <span>✦</span>
+            <div className={styles.heroSymbol}>
+              <div className={styles.symbolCircle}>
+                <span>✦</span>
+              </div>
+
+              <div className={styles.symbolOrbit} />
             </div>
           </header>
 
-          {/* CRIAR PUBLICAÇÃO */}
+          {/* NOVA PUBLICAÇÃO */}
           <section className={styles.createPost}>
-            <div className={styles.createTop}>
+            <div className={styles.createHeader}>
               <div className={styles.avatar}>D</div>
 
-              <div className={styles.inputFake}>
-                <span>Fale sobre o livro que está lendo...</span>
+              <div>
+                <span className={styles.createLabel}>
+                  SUA PRÓXIMA PÁGINA
+                </span>
+
+                <h2>O que você está lendo?</h2>
               </div>
             </div>
 
-            <div className={styles.createBottom}>
-              <button className={styles.actionButton}>
-                <span>📖</span>
+            <div className={styles.inputArea}>
+              <span>
+                Compartilhe um momento da sua leitura...
+              </span>
+            </div>
+
+            <div className={styles.createFooter}>
+              <button className={styles.readingButton}>
+                <span>＋</span>
                 Atualizar leitura
               </button>
 
               <button className={styles.publishButton}>
                 Publicar
+                <span>→</span>
               </button>
             </div>
           </section>
 
+          {/* DIVISOR */}
+          <div className={styles.sectionDivider}>
+            <span />
+            <div>
+              <span>✦</span>
+              <strong>JORNADAS RECENTES</strong>
+            </div>
+            <span />
+          </div>
+
           {/* FEED */}
           <section className={styles.feed}>
-            <div className={styles.feedHeader}>
-              <h2>Atualizações</h2>
+            <div className={styles.feedTop}>
+              <div>
+                <span className={styles.feedEyebrow}>
+                  O QUE ESTÁ SENDO LIDO
+                </span>
+
+                <h2>Entre páginas</h2>
+              </div>
 
               <button className={styles.filterButton}>
-                Mais recentes <span>⌄</span>
+                Mais recentes
+                <span>⌄</span>
               </button>
             </div>
 
@@ -130,10 +171,10 @@ function Home() {
                   className={styles.post}
                   key={historico.id}
                 >
-                  {/* USUÁRIO */}
+                  {/* CABEÇALHO DO POST */}
                   <div className={styles.postHeader}>
                     <div className={styles.userInfo}>
-                      <div className={styles.avatar}>
+                      <div className={styles.postAvatar}>
                         {historico.initials}
                       </div>
 
@@ -141,7 +182,8 @@ function Home() {
                         <strong>{historico.user}</strong>
 
                         <p>
-                          está lendo <span>✦</span>{" "}
+                          está em uma nova jornada
+                          <span> · </span>
                           {historico.time}
                         </p>
                       </div>
@@ -152,18 +194,22 @@ function Home() {
                     </button>
                   </div>
 
-                  {/* LIVRO */}
+                  {/* CONTEÚDO DO LIVRO */}
                   <div className={styles.bookContent}>
-                    <div className={styles.coverWrapper}>
-                      <img
-                        src={historico.cover}
-                        alt={`Capa de ${historico.book}`}
-                        className={styles.cover}
-                      />
+                    <div className={styles.coverArea}>
+                      <div className={styles.coverGlow} />
+
+                      <div className={styles.coverWrapper}>
+                        <img
+                          src={historico.cover}
+                          alt={`Capa de ${historico.book}`}
+                          className={styles.cover}
+                        />
+                      </div>
                     </div>
 
                     <div className={styles.bookInfo}>
-                      <span className={styles.bookLabel}>
+                      <span className={styles.bookStatus}>
                         LENDO AGORA
                       </span>
 
@@ -173,10 +219,9 @@ function Home() {
                         {historico.author}
                       </p>
 
-                      {/* PROGRESSO */}
                       <div className={styles.progressArea}>
-                        <div className={styles.progressInfo}>
-                          <span>Progresso da leitura</span>
+                        <div className={styles.progressHeader}>
+                          <span>Jornada percorrida</span>
 
                           <strong>
                             {historico.progress}%
@@ -195,10 +240,12 @@ function Home() {
                     </div>
                   </div>
 
-                  {/* DESCRIÇÃO */}
-                  <p className={styles.description}>
-                    “{historico.description}”
-                  </p>
+                  {/* PENSAMENTO */}
+                  <div className={styles.thought}>
+                    <span className={styles.quoteMark}>“</span>
+
+                    <p>{historico.description}</p>
+                  </div>
 
                   {/* INTERAÇÕES */}
                   <div className={styles.postFooter}>
@@ -215,13 +262,23 @@ function Home() {
                     </div>
 
                     <button className={styles.shareButton}>
-                      ↗
+                      Compartilhar
+                      <span>↗</span>
                     </button>
                   </div>
                 </article>
               ))}
             </div>
           </section>
+
+          {/* RODAPÉ DECORATIVO */}
+          <div className={styles.endDecoration}>
+            <span>✧</span>
+            <span />
+            <span>✦</span>
+            <span />
+            <span>✧</span>
+          </div>
         </div>
       </main>
     </>

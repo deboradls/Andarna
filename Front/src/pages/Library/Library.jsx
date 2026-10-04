@@ -10,9 +10,147 @@ function Stars({ value, onChange, title }) {
   return <div className={styles.stars} role="group" aria-label={`Avaliação de ${title}`}>{[1, 2, 3, 4, 5].map((star) => <button type="button" key={star} className={star <= value ? styles.filled : ''} onClick={() => onChange(star === value ? 0 : star)} aria-label={`${star} estrela${star > 1 ? 's' : ''}`}>★</button>)}</div>;
 }
 
-function BookTile({ item, shelf, shelves, open, onToggle, onProgress, onDetails, onStatus, onOrganize }) {
-  const progress = item.progress ?? 0; const rating = item.rating ?? 0;
-  return <article className={styles.bookTile} onClick={onToggle}><div className={styles.tileCover}>{item.book.thumbnailUrl ? <img src={item.book.thumbnailUrl} alt={`Capa de ${item.book.title}`} /> : item.book.title}</div><h3 title={item.book.title}>{item.book.title}</h3><p className={styles.bookMeta}><span>{progress}%</span><span aria-label={rating ? `${rating} de 5 estrelas` : 'Sem avaliação'}>{rating ? `${rating} ★` : 'Sem avaliação'}</span></p>{open && <div className={styles.bookMenu} onClick={(event) => event.stopPropagation()}><button type="button" className={styles.updateProgressButton} onClick={() => onProgress(item)}>Atualizar progresso</button><label className={styles.tileStatus}>Status<select value={item.status} onChange={(event) => onStatus(item.id, event.target.value)}>{Object.entries(statuses).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label><Stars value={rating} title={item.book.title} onChange={(ratingValue) => onDetails(item.id, { rating: ratingValue })} /><details className={styles.organization}><summary>Organização</summary><div><p>Outra estante</p>{shelves.filter((target) => target.id !== shelf.id).map((target) => <div className={styles.organizationOption} key={target.id}><span>{target.name}</span><button type="button" onClick={() => onOrganize('move', item.id, shelf.id, target.id)}>Mover</button><button type="button" onClick={() => onOrganize('copy', item.id, shelf.id, target.id)}>Duplicar</button></div>)}<button type="button" className={styles.removeButton} onClick={() => onOrganize('remove', item.id, shelf.id)}>Remover desta estante</button></div></details></div>}</article>;
+function BookTile({
+  item,
+  shelf,
+  shelves,
+  open,
+  onToggle,
+  onProgress,
+  onDetails,
+  onStatus,
+  onOrganize,
+}) {
+  const progress = item.progress ?? 0;
+  const rating = item.rating ?? 0;
+
+  return (
+    <article
+      className={`${styles.bookTile} ${open ? styles.bookTileOpen : ""}`}
+    >
+      <button
+        type="button"
+        className={styles.bookButton}
+        onClick={onToggle}
+        aria-label={`Abrir opções de ${item.book.title}`}
+      >
+        <div className={styles.tileCover}>
+          {item.book.thumbnailUrl ? (
+            <img
+              src={item.book.thumbnailUrl}
+              alt={`Capa de ${item.book.title}`}
+            />
+          ) : (
+            item.book.title
+          )}
+        </div>
+      </button>
+
+      {open && (
+        <div
+          className={styles.bookMenu}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className={styles.menuBookTitle}>
+            {item.book.title}
+          </div>
+
+          <button
+            type="button"
+            className={styles.updateProgressButton}
+            onClick={() => onProgress(item)}
+          >
+            Atualizar progresso
+          </button>
+
+          <label className={styles.tileStatus}>
+            Status
+            <select
+              value={item.status}
+              onChange={(event) =>
+                onStatus(item.id, event.target.value)
+              }
+            >
+              {Object.entries(statuses).map(([value, label]) => (
+                <option value={value} key={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <Stars
+            value={rating}
+            title={item.book.title}
+            onChange={(ratingValue) =>
+              onDetails(item.id, { rating: ratingValue })
+            }
+          />
+
+          <details className={styles.organization}>
+            <summary>Organização</summary>
+
+            <div>
+              <p>Outra estante</p>
+
+              {shelves
+                .filter((target) => target.id !== shelf.id)
+                .map((target) => (
+                  <div
+                    className={styles.organizationOption}
+                    key={target.id}
+                  >
+                    <span>{target.name}</span>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onOrganize(
+                          "move",
+                          item.id,
+                          shelf.id,
+                          target.id
+                        )
+                      }
+                    >
+                      Mover
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onOrganize(
+                          "copy",
+                          item.id,
+                          shelf.id,
+                          target.id
+                        )
+                      }
+                    >
+                      Duplicar
+                    </button>
+                  </div>
+                ))}
+
+              <button
+                type="button"
+                className={styles.removeButton}
+                onClick={() =>
+                  onOrganize(
+                    "remove",
+                    item.id,
+                    shelf.id
+                  )
+                }
+              >
+                Remover desta estante
+              </button>
+            </div>
+          </details>
+        </div>
+      )}
+    </article>
+  );
 }
 
 function Library() {

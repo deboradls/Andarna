@@ -177,7 +177,7 @@ function Navbar() {
 
 
                 {/* Atualizações */}
-                <NavLink
+                {/* <NavLink
                     to="/updates"
                     className={({ isActive }) =>
                         `${styles.navLink} ${isActive ? styles.active : ''}`
@@ -185,7 +185,7 @@ function Navbar() {
                     onClick={closeMenu}
                 >
                     Atualizações
-                </NavLink>
+                </NavLink> */}
 
 
                 {/* Catálogo */}
