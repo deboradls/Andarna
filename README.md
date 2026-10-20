@@ -28,5 +28,5 @@ O projeto está sendo desenvolvido como parte da graduação em **Ciência da Co
 | Sprint 0 | 🎨 Pitch de Apresentação | [Acessar apresentação no Canva](https://canva.link/dnegbp8gwofebug) |
 | Sprint 1 | 🎨 Protótipos | [Acessar protótipos no Figma](https://www.figma.com/design/PcMFynhj30EwvXHzO5VGkQ/ANDARNA?node-id=0-1&t=Rduvig1Q8n4E6zZS-1) |
 | Sprint 2 | 📋 Requisitos Ágeis | [Acessar requisitos no Google Docs](https://docs.google.com/document/d/1sn2PDpvMiKkfSSkdzYmMJ5L970mMaJg6/edit?usp=sharing&ouid=110889014359565880507&rtpof=true&sd=true) |
-| Sprint 3 | 🔐 Login | [Acessar vídeo de apresentação]([link](https://drive.google.com/file/d/1BcWSK6CH4Beasp8QkijIH_pxW7wvpp_Y/view?usp=drive_link)) |
+| Sprint 3 | 🔐 Login | [Acessar vídeo de apresentação]((https://drive.google.com/file/d/1BcWSK6CH4Beasp8QkijIH_pxW7wvpp_Y/view?usp=drive_link)) |
 | Sprint 4 | ⚙️ Funcionalidades e CRUD | [Acessar vídeo de apresentação](https://drive.google.com/file/d/1EdfyHwGHiqStAd-pXpwFhiKzpHAJFBuX/view?usp=sharing) |
