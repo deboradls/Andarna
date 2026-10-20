@@ -2,6 +2,12 @@ import { ArrayMaxSize, ArrayUnique, IsArray, IsDateString, IsEnum, IsIn, IsInt, 
 import { ReadingStatus } from '../entities/user-book.entity';
 
 export class CreateShelfDto { @IsString() @MaxLength(80) name: string; @IsOptional() @IsString() @MaxLength(280) description?: string; }
+export class CreateReadingUpdateDto {
+  @IsIn(['percentage', 'pages']) mode: 'percentage' | 'pages';
+  @IsInt() @Min(0) value: number;
+  @IsDateString({ strict: true }) @MaxLength(10) readDate: string;
+  @IsOptional() @IsString() @MaxLength(2000) description?: string;
+}
 export class AddBookDto { @IsString() googleVolumeId: string; @IsEnum(ReadingStatus) status: ReadingStatus; @IsArray() @ArrayUnique() @ArrayMaxSize(30) @IsUUID('4', { each: true }) shelfIds: string[]; }
 export class UpdateStatusDto { @IsEnum(ReadingStatus) status: ReadingStatus; }
 export class UpdateBookDetailsDto {

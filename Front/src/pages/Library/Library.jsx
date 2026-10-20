@@ -1,201 +1,123 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { createPortal } from 'react-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
 import { libraryApi } from '../../services/api';
 import styles from './Library.module.css';
+import BookTile from './BookTile';
+import { getLibrarySummary } from './librarySummary';
 
 const statuses = { want_to_read: 'Quero ler', reading: 'Lendo', read: 'Lido', abandoned: 'Abandonei' };
+const normalizeSearch = (value) => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
 
-function Stars({ value, onChange, title }) {
-  return <div className={styles.stars} role="group" aria-label={`Avaliação de ${title}`}>{[1, 2, 3, 4, 5].map((star) => <button type="button" key={star} className={star <= value ? styles.filled : ''} onClick={() => onChange(star === value ? 0 : star)} aria-label={`${star} estrela${star > 1 ? 's' : ''}`}>★</button>)}</div>;
-}
+function ShelfActions({ shelf, onSaved, onDeleted }) {
+  const [open, setOpen] = useState(false);
+  const [action, setAction] = useState('');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
 
-function BookTile({
-  item,
-  shelf,
-  shelves,
-  open,
-  onToggle,
-  onProgress,
-  onDetails,
-  onStatus,
-  onOrganize,
-}) {
-  const progress = item.progress ?? 0;
-  const rating = item.rating ?? 0;
+  useEffect(() => {
+    if (!open) return;
+    const close = (event) => {
+      if (!event.target.closest(`[data-shelf-menu="${shelf.id}"]`)) setOpen(false);
+    };
+    const escape = (event) => { if (event.key === 'Escape') setOpen(false); };
+    document.addEventListener('pointerdown', close);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', close);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [open, shelf.id]);
 
-  return (
-    <article
-      className={`${styles.bookTile} ${open ? styles.bookTileOpen : ""}`}
-    >
-      <button
-        type="button"
-        className={styles.bookButton}
-        onClick={onToggle}
-        aria-label={`Abrir opções de ${item.book.title}`}
-      >
-        <div className={styles.tileCover}>
-          {item.book.thumbnailUrl ? (
-            <img
-              src={item.book.thumbnailUrl}
-              alt={`Capa de ${item.book.title}`}
-            />
-          ) : (
-            item.book.title
-          )}
-        </div>
-      </button>
+  const startAction = (nextAction) => {
+    setName(shelf.name); setDescription(shelf.description || '');
+    setError(''); setOpen(false); setAction(nextAction);
+  };
+  const submit = async (event) => {
+    event.preventDefault();
+    if (saving) return;
+    if (action === 'edit' && !name.trim()) { setError('Informe o nome da estante.'); return; }
+    setSaving(true); setError('');
+    try {
+      if (action === 'edit') {
+        const updated = await libraryApi.updateShelf(shelf.id, { name: name.trim(), description: description.trim() });
+        setAction(''); onSaved(updated);
+      } else {
+        await libraryApi.deleteShelf(shelf.id);
+        setAction(''); onDeleted(shelf.id);
+      }
+    } catch (requestError) { setError(requestError.message); }
+    finally { setSaving(false); }
+  };
 
-      {open && (
-        <div
-          className={styles.bookMenu}
-          onClick={(event) => event.stopPropagation()}
-        >
-          <div className={styles.menuBookTitle}>
-            {item.book.title}
-          </div>
-
-          <button
-            type="button"
-            className={styles.updateProgressButton}
-            onClick={() => onProgress(item)}
-          >
-            Atualizar progresso
-          </button>
-
-          <label className={styles.tileStatus}>
-            Status
-            <select
-              value={item.status}
-              onChange={(event) =>
-                onStatus(item.id, event.target.value)
-              }
-            >
-              {Object.entries(statuses).map(([value, label]) => (
-                <option value={value} key={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <Stars
-            value={rating}
-            title={item.book.title}
-            onChange={(ratingValue) =>
-              onDetails(item.id, { rating: ratingValue })
-            }
-          />
-
-          <details className={styles.organization}>
-            <summary>Organização</summary>
-
-            <div>
-              <p>Outra estante</p>
-
-              {shelves
-                .filter((target) => target.id !== shelf.id)
-                .map((target) => (
-                  <div
-                    className={styles.organizationOption}
-                    key={target.id}
-                  >
-                    <span>{target.name}</span>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onOrganize(
-                          "move",
-                          item.id,
-                          shelf.id,
-                          target.id
-                        )
-                      }
-                    >
-                      Mover
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onOrganize(
-                          "copy",
-                          item.id,
-                          shelf.id,
-                          target.id
-                        )
-                      }
-                    >
-                      Duplicar
-                    </button>
-                  </div>
-                ))}
-
-              <button
-                type="button"
-                className={styles.removeButton}
-                onClick={() =>
-                  onOrganize(
-                    "remove",
-                    item.id,
-                    shelf.id
-                  )
-                }
-              >
-                Remover desta estante
-              </button>
-            </div>
-          </details>
-        </div>
-      )}
-    </article>
-  );
+  return <div className={styles.shelfActions}>
+    <a className={styles.addBookButton} href={`/catalog?shelfId=${shelf.id}`}>Adicionar livro</a>
+    <div className={styles.shelfMenuContainer} data-shelf-menu={shelf.id}>
+      <button type="button" className={styles.shelfMenuButton} aria-label={`Opções da estante ${shelf.name}`} aria-expanded={open} aria-controls={`shelf-menu-${shelf.id}`} onClick={() => setOpen((current) => !current)}>⋮</button>
+      {open && <div className={styles.shelfDropdown} id={`shelf-menu-${shelf.id}`}>
+        <button type="button" onClick={() => startAction('edit')}>Editar estante</button>
+        <button type="button" className={styles.dangerAction} onClick={() => startAction('delete')}>Excluir estante</button>
+      </div>}
+    </div>
+    {action && createPortal(<div className={styles.modalBackdrop}>
+      <section className={styles.modal} role="dialog" aria-modal="true" aria-labelledby={`shelf-action-${shelf.id}`} onKeyDown={(event) => { if (event.key === 'Escape' && !saving) setAction(''); }}>
+        <button type="button" className={styles.closeModal} disabled={saving} aria-label="Fechar" onClick={() => setAction('')}>×</button>
+        <h2 id={`shelf-action-${shelf.id}`}>{action === 'edit' ? 'Editar estante' : 'Excluir estante'}</h2>
+        <form className={styles.createShelfForm} onSubmit={submit}>
+          {action === 'edit' ? <>
+            <label>Nome<input value={name} onChange={(event) => setName(event.target.value)} maxLength="80" required autoFocus disabled={saving} /></label>
+            <label>Descrição <span>(opcional)</span><textarea value={description} onChange={(event) => setDescription(event.target.value)} maxLength="280" disabled={saving} /></label>
+          </> : <p className={styles.shelfDialogHelp}>Excluir a estante “{shelf.name}”? Os livros e seus registros de leitura serão preservados na biblioteca e nas outras estantes.</p>}
+          {error && <p className={styles.shelfDialogError} role="alert">{error}</p>}
+          <button type="submit" className={action === 'delete' ? styles.dangerAction : undefined} disabled={saving}>{saving ? 'Aguarde...' : action === 'edit' ? 'Salvar alterações' : 'Excluir estante'}</button>
+          <button type="button" autoFocus={action === 'delete'} disabled={saving} onClick={() => setAction('')}>Cancelar</button>
+        </form>
+      </section>
+    </div>, document.body)}
+  </div>;
 }
 
 function Library() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
+  const [search, setSearch] = useState('');
   const [items, setItems] = useState([]);
   const [shelves, setShelves] = useState([]);
   const [error, setError] = useState('');
   const [creatingShelf, setCreatingShelf] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [newShelf, setNewShelf] = useState('');
   const [newShelfDescription, setNewShelfDescription] = useState('');
-  const [activeBook, setActiveBook] = useState('');
-  const [progressRecord, setProgressRecord] = useState(null);
-  const [readingMode, setReadingMode] = useState('percentage');
-  const [readingValue, setReadingValue] = useState('');
-  const [readDate, setReadDate] = useState(new Date().toISOString().slice(0, 10));
-  const [readingNote, setReadingNote] = useState('');
-  const [completionRating, setCompletionRating] = useState(0);
   const status = params.get('status') || '';
   const shelfId = params.get('shelfId') || '';
-  const load = () => libraryApi.library({ ...(status && { status }), ...(shelfId && { shelfId }) }).then(setItems).catch((requestError) => setError(requestError.message));
-
   useEffect(() => {
-    load(); libraryApi.shelves().then(setShelves).catch(() => { });
-  },
-    [status, shelfId]);
+    let active = true;
+    Promise.all([libraryApi.library(), libraryApi.shelves()])
+      .then(([books, collections]) => { if (active) { setItems(books); setShelves(collections); } })
+      .catch((requestError) => { if (active) setError(requestError.message); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
 
-  const updateDetails = async (id, details) => {
-    try {
-      const updated = await libraryApi.updateBookDetails(id, details);
-      setItems((current) => current.map((item) => item.id === id ? updated : item));
-    } catch (requestError) { setError(requestError.message); }
-  };
-
-  const changeStatus = async (id, nextStatus) => {
-    try {
-      const updated = await libraryApi.updateStatus(id, nextStatus);
-      setItems((current) => current.map((item) => item.id === id ? updated : item));
-    }
-    catch (requestError) {
-      setError(requestError.message);
-
-    }
-  };
-
-  const visibleShelves = shelves.filter((shelf) => !shelfId || shelf.id === shelfId);
+  const query = normalizeSearch(search.trim());
+  const summary = getLibrarySummary(items, shelves);
+  const hasFilters = Boolean(status || query);
+  const visibleShelves = shelves
+    .filter((shelf) => !shelfId || shelf.id === shelfId)
+    .map((shelf) => ({
+      ...shelf,
+      books: items.filter((item) =>
+        item.shelfLinks.some((link) => link.shelfId === shelf.id) &&
+        (!status || item.status === status) &&
+        (!query || normalizeSearch(shelf.name).includes(query) ||
+          normalizeSearch(item.book.title).includes(query) ||
+          (item.book.authors || []).some((author) => normalizeSearch(author).includes(query)))
+      ),
+    }))
+    .filter((shelf) => !hasFilters || shelf.books.length > 0 ||
+      (!status && query && normalizeSearch(shelf.name).includes(query)));
   const createShelf = async (event) => {
     event.preventDefault();
     if (!newShelf.trim()) return;
@@ -205,52 +127,65 @@ function Library() {
       setNewShelf(''); setNewShelfDescription(''); setCreatingShelf(false);
     } catch (requestError) { setError(requestError.message); }
   };
-  const organizeBook = async (action, id, sourceShelfId, targetShelfId) => {
-    try {
-      if (action === 'copy') await libraryApi.addToShelf(id, targetShelfId);
-      if (action === 'move') { await libraryApi.addToShelf(id, targetShelfId); await libraryApi.removeFromShelf(id, sourceShelfId); }
-      if (action === 'remove') await libraryApi.removeFromShelf(id, sourceShelfId);
-      setActiveBook(''); load();
-    } catch (requestError) { setError(requestError.message); }
-  };
-  const openProgress = (item) => { setProgressRecord(item); setReadingMode(item.readingMode || 'percentage'); setReadingValue(item.readingMode === 'percentage' ? String(item.progress ?? 0) : String(item.readingValue ?? '')); setReadDate(item.lastReadAt || new Date().toISOString().slice(0, 10)); setReadingNote(item.readingNote || ''); setCompletionRating(item.rating || 0); };
-  const calculatedProgress = () => { if (!progressRecord) return 0; const value = Number(readingValue) || 0; const total = readingMode === 'percentage' ? 100 : progressRecord.book.pageCount || 100; return Math.min(100, Math.round((value / total) * 100)); };
-  const saveProgress = async (event) => { event.preventDefault(); const progress = calculatedProgress(); if (progress === 100 && !completionRating) { setError('Ao concluir o livro, escolha de 1 a 5 estrelas.'); return; } try { const updated = await libraryApi.updateBookDetails(progressRecord.id, { readingMode, readingValue: Number(readingValue), readDate, readingNote, rating: completionRating || undefined }); setItems((current) => current.map((item) => item.id === updated.id ? updated : item)); setProgressRecord(null); setActiveBook(''); } catch (requestError) { setError(requestError.message); } };
-
   return <>
     <Navbar />
     <main className={styles.page}>
 
       <header className={styles.pageHeader}>
-        <div><p className={styles.eyebrow}>Minhas estantes</p><h1>Sua biblioteca</h1><p>Crie estantes para qualquer tema. Status, progresso e avaliação pertencem ao livro, mesmo quando ele aparece em mais de uma estante.</p></div>
-        <button className={styles.createButton} onClick={() => setCreatingShelf(true)}>Criar estante</button>
+        <div><p className={styles.eyebrow}>✦ Seu universo particular</p><h1>Histórias que<br />moram <em>com você.</em></h1><p>As leituras que marcaram, as que acompanham seus dias e as próximas descobertas. Cada história no seu lugar.</p>
+          <div className={styles.headerActions}><button className={styles.createButton} onClick={() => setCreatingShelf(true)}>Criar estante</button><Link className={styles.exploreLink} to="/catalog">Explorar catálogo <span aria-hidden="true">↗</span></Link></div>
+        </div>
+        <div className={styles.collectionArt} aria-hidden="true"><span className={styles.artOrbit} /><span className={styles.artStar}>✦</span><div className={styles.artVolumes}><i>HISTÓRIAS</i><i>MEMÓRIAS</i><i>DESCOBERTAS</i><i>ANDARNA</i></div><span className={styles.artShelf} /><p>Um lugar para cada capítulo.</p></div>
       </header>
+      <div className={styles.overview} aria-label="Resumo da sua biblioteca" aria-busy={loading}>
+        {[{ value: summary.shelves, label: 'Estantes criadas', icon: '⌑' }, { value: summary.books, label: 'Livros na biblioteca', icon: '◈' }, { value: summary.reading, label: 'Em leitura', icon: '◉' }, { value: summary.read, label: 'Histórias concluídas', icon: '✓' }].map((stat) => <div key={stat.label}><span className={styles.overviewIcon} aria-hidden="true">{stat.icon}</span><div><strong>{loading || error ? '—' : stat.value.toLocaleString('pt-BR')}</strong><span>{stat.label}</span></div></div>)}
+      </div>
       {creatingShelf && <div className={styles.modalBackdrop} role="presentation"><section className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="new-shelf-title"><button type="button" className={styles.closeModal} onClick={() => setCreatingShelf(false)} aria-label="Fechar">×</button><p className={styles.eyebrow}>Nova estante</p><h2 id="new-shelf-title">Crie uma coleção</h2><form className={styles.createShelfForm} onSubmit={createShelf}><label>Nome<input value={newShelf} onChange={(event) => setNewShelf(event.target.value)} maxLength="80" autoFocus required placeholder="Ex.: Livros 2026" /></label><label>Descrição <span>(opcional)</span><textarea value={newShelfDescription} onChange={(event) => setNewShelfDescription(event.target.value)} maxLength="280" placeholder="O que você quer guardar nesta estante?" /></label><button>Criar estante</button></form></section></div>}
 
       <div className={styles.filters}>
-        <a className={!status && !shelfId ? styles.active : ''}
-          href="/shelves/books">Todas</a>
-        {Object.entries(statuses).map(([key, label]) =>
-          <a key={key} className={status === key ? styles.active : ''}
-            href={`/shelves/books?status=${key}`}>{label}</a>)}
+        <label className={styles.statusFilter}>
+          Status de leitura
+          <select value={status} onChange={(event) => {
+            const nextParams = new URLSearchParams(params);
+            if (event.target.value) nextParams.set('status', event.target.value);
+            else nextParams.delete('status');
+            setParams(nextParams);
+
+          }}>
+            <option value="">Todas</option>
+            {Object.entries(statuses).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+          </select>
+        </label>
+        <label className={styles.searchFilter}>
+          Buscar nas estantes
+          <input type="search" value={search} onChange={(event) => { setSearch(event.target.value);  }} placeholder="Nome da estante, livro ou autor" />
+        </label>
       </div>
 
-      {error && <p className={styles.error}>{error}</p>}<section className={styles.shelfGrid}>{visibleShelves.map((shelf) => {
-        const shelfBooks = items.filter((item) => item.shelfLinks.some((link) => link.shelfId === shelf.id));
-        return <article className={styles.shelf} key={shelf.id}><header><div><h2>{shelf.name}</h2>{shelf.description && <p>{shelf.description}</p>}
-          <span>{shelfBooks.length} {shelfBooks.length === 1 ? 'livro' : 'livros'}</span></div><a className={styles.addBookButton} href={`/catalog?shelfId=${shelf.id}`}>Adicionar livro</a>
+      <div className={styles.collectionHeading}><div><p className={styles.eyebrow}>Organizadas do seu jeito</p><h2>Minhas estantes</h2></div><span>{loading ? 'Carregando...' : `${visibleShelves.length} ${visibleShelves.length === 1 ? 'estante' : 'estantes'}${hasFilters || shelfId ? ' nesta seleção' : ' na sua coleção'}`}</span></div>
+      {error && <p className={styles.error} role="alert">{error}</p>}
+      {loading && <p className={styles.loadingState} role="status">Preparando suas estantes...</p>}
+      <section className={styles.shelfGrid} aria-label="Suas estantes" aria-busy={loading}>{visibleShelves.map((shelf, index) => {
+        const shelfBooks = shelf.books;
+        return <article className={styles.shelf} key={shelf.id}><header><div className={styles.shelfIdentity}><span className={styles.shelfNumber} aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><h2>{shelf.name}</h2>{shelf.description && <p>{shelf.description}</p>}
+          <span>{shelfBooks.length} {shelfBooks.length === 1 ? 'livro' : 'livros'}</span></div></div>
+          <ShelfActions shelf={shelf} onSaved={(updated) => setShelves((current) => current.map((entry) => entry.id === updated.id ? updated : entry).sort((a, b) => a.name.localeCompare(b.name)))} onDeleted={(id) => {
+            setShelves((current) => current.filter((entry) => entry.id !== id));
+            setItems((current) => current.map((item) => ({ ...item, shelfLinks: item.shelfLinks.filter((link) => link.shelfId !== id) })));
+
+            if (shelfId === id) { const nextParams = new URLSearchParams(params); nextParams.delete('shelfId'); setParams(nextParams); }
+          }} />
         </header>
-          <div className={styles.tiles}>{shelfBooks.map((item) => { const itemKey = `${item.id}:${shelf.id}`; return <BookTile key={item.id} item={item} shelf={shelf} shelves={shelves} open={activeBook === itemKey} onToggle={() => setActiveBook((current) => current === itemKey ? '' : itemKey)} onProgress={openProgress} onDetails={updateDetails} onStatus={changeStatus} onOrganize={organizeBook} />; })}{shelfBooks.length === 0 &&
-            <p className={styles.emptyShelf}>Ainda não há livros nesta estante.</p>}
+          <div className={styles.tiles}>{shelfBooks.map((item) => <BookTile key={item.id} item={item} shelf={shelf} onUpdated={(updated) => setItems((current) => current.map((entry) => entry.id === updated.id ? updated : entry))} onRemoved={(id, removedShelfId) => setItems((current) => current.map((entry) => entry.id === id ? { ...entry, shelfLinks: entry.shelfLinks.filter((link) => link.shelfId !== removedShelfId) } : entry))} />)}{shelfBooks.length === 0 &&
+            <div className={styles.emptyShelf}><span aria-hidden="true">✧</span><p>Uma estante à espera de histórias.</p><Link to={`/catalog?shelfId=${shelf.id}`}>Encontre seu primeiro livro ↗</Link></div>}
           </div>
         </article>;
       })}
 
-      </section>{!error && visibleShelves.length === 0 &&
-        <div className={styles.empty}>Nenhuma estante nesta seleção. Use o
-          <a href="/catalog">Catálogo</a> para criar uma e adicionar livros.
+      </section>{!loading && !error && visibleShelves.length === 0 &&
+        <div className={styles.empty}><h3>{hasFilters ? 'Nenhuma história nesta busca' : 'Sua coleção começa com uma estante'}</h3><p>{hasFilters ? 'Experimente outro nome ou status de leitura para encontrar seus livros.' : 'Crie um espaço para seus temas, autores e histórias favoritas.'}</p>{hasFilters ? <button type="button" onClick={() => { setSearch(''); const next = new URLSearchParams(params); next.delete('status'); setParams(next); }}>Limpar filtros</button> : <button type="button" onClick={() => setCreatingShelf(true)}>Criar minha primeira estante</button>}
         </div>}
 
-    </main>{progressRecord && <div className={styles.modalBackdrop}><section className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="progress-title"><button type="button" className={styles.closeModal} onClick={() => setProgressRecord(null)} aria-label="Fechar">×</button><p className={styles.eyebrow}>Registro de leitura</p><h2 id="progress-title">{progressRecord.book.title}</h2><form className={styles.progressForm} onSubmit={saveProgress}><label>Modo de leitura?<select value={readingMode} onChange={(event) => setReadingMode(event.target.value)}><option value="pages">Página</option><option value="percentage">Porcentagem</option><option value="minutes">Minutagem</option></select></label><label>{readingMode === 'pages' ? 'Em qual página você está?' : readingMode === 'minutes' ? 'Quantos minutos você leu?' : 'Qual é o progresso?' }<input type="number" min="0" max={readingMode === 'percentage' ? 100 : undefined} value={readingValue} onChange={(event) => setReadingValue(event.target.value)} required /></label><div className={styles.progressPreview}><progress value={calculatedProgress()} max="100" /><span>{progressRecord.book.pageCount ? `${progressRecord.book.pageCount} páginas` : 'Páginas não informadas'}</span></div>{readingMode === 'minutes' && <small className={styles.modalHelp}>A minutagem usa a quantidade de páginas como referência para calcular o percentual.</small>}<label>Que dia você leu?<input type="date" value={readDate} onChange={(event) => setReadDate(event.target.value)} required /></label><label>O que você está pensando?<textarea value={readingNote} onChange={(event) => setReadingNote(event.target.value)} maxLength="2000" placeholder="Uma ideia, impressão ou frase impactante..." /></label>{calculatedProgress() === 100 && <fieldset className={styles.ratingField}><legend>Você concluiu o livro! Dê uma avaliação.</legend><Stars value={completionRating} title={progressRecord.book.title} onChange={setCompletionRating} /></fieldset>}<button>Salvar progresso</button></form></section></div>}</>;
+    </main></>;
 }
 export default Library;

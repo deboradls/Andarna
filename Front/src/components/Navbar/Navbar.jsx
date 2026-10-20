@@ -6,18 +6,27 @@ import styles from './Navbar.module.css';
 import logo from '../../assets/logo/logo_andarna.png';
 
 function Navbar() {
-    const [openMenu, setOpenMenu] = useState(null);
 
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+    const [loggingOut, setLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState('');
     const avatarInitial = (user?.name || user?.email || '?').charAt(0).toUpperCase();
 
-    const toggleMenu = (menu) => {
-        setOpenMenu(openMenu === menu ? null : menu);
-    };
+    const handleLogout = async () => {
+        if (loggingOut) return;
 
-    const closeMenu = () => {
-        setOpenMenu(null);
+        setLoggingOut(true);
+        setLogoutError('');
+
+        try {
+            await logout();
+            navigate('/', { replace: true });
+        } catch {
+            setLogoutError('Não foi possível sair. Tente novamente.');
+        } finally {
+            setLoggingOut(false);
+        }
     };
 
     return (
@@ -49,7 +58,6 @@ function Navbar() {
                     className={({ isActive }) =>
                         `${styles.navLink} ${isActive ? styles.active : ''}`
                     }
-                    onClick={closeMenu}
                 >
                     Início
                 </NavLink>
@@ -81,7 +89,6 @@ function Navbar() {
                             <NavLink
                                 to="/shelves/books"
                                 className={styles.dropdownItem}
-                                onClick={closeMenu}
                             >
                                 <span>📚</span>
                                 Livros
@@ -90,7 +97,6 @@ function Navbar() {
                             <NavLink
                                 to="/shelves/manga"
                                 className={styles.dropdownItem}
-                                onClick={closeMenu}
                             >
                                 <span>📖</span>
                                 Mangás
@@ -102,87 +108,12 @@ function Navbar() {
                 </div>
 
 
-                {/* Minha Jornada */}
-                <div className={styles.dropdownContainer}>
-
-                    <button
-                        className={`${styles.navLink} ${styles.dropdownButton}`}
-                        onClick={() => toggleMenu('journey')}
-                    >
-                        Minha Jornada
-
-                        <span
-                            className={`${styles.arrow} ${openMenu === 'journey'
-                                ? styles.arrowOpen
-                                : ''
-                                }`}
-                        >
-                            ▾
-                        </span>
-                    </button>
-
-
-                    {openMenu === 'journey' && (
-                        <div className={styles.dropdown}>
-
-                            <NavLink
-                            to="/shelves/books?status=read"
-                                className={styles.dropdownItem}
-                                onClick={closeMenu}
-                            >
-                                <span>📚</span>
-                                Lidos
-                            </NavLink>
-
-                            <NavLink
-                            to="/shelves/books?status=reading"
-                                className={styles.dropdownItem}
-                                onClick={closeMenu}
-                            >
-                                <span>📖</span>
-                                Lendo
-                            </NavLink>
-
-                            <NavLink
-                            to="/shelves/books?status=want_to_read"
-                                className={styles.dropdownItem}
-                                onClick={closeMenu}
-                            >
-                                <span>🔖</span>
-                                Quero ler
-                            </NavLink>
-
-                            <NavLink
-                            to="/shelves/books?status=abandoned"
-                                className={styles.dropdownItem}
-                                onClick={closeMenu}
-                            >
-                                <span>🚫</span>
-                                Abandonados
-                            </NavLink>
-
-                            <NavLink
-                                to="/journey/favorites"
-                                className={styles.dropdownItem}
-                                onClick={closeMenu}
-                            >
-                                <span>❤️</span>
-                                Favoritos
-                            </NavLink>
-
-                        </div>
-                    )}
-
-                </div>
-
-
                 {/* Atualizações */}
                 {/* <NavLink
                     to="/updates"
                     className={({ isActive }) =>
                         `${styles.navLink} ${isActive ? styles.active : ''}`
                     }
-                    onClick={closeMenu}
                 >
                     Atualizações
                 </NavLink> */}
@@ -194,9 +125,11 @@ function Navbar() {
                     className={({ isActive }) =>
                         `${styles.navLink} ${isActive ? styles.active : ''}`
                     }
-                    onClick={closeMenu}
                 >
                     Catálogo
+                </NavLink>
+                <NavLink to="/quotations" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>
+                    Citações
                 </NavLink>
 
             </div>
@@ -214,6 +147,21 @@ function Navbar() {
                         {avatarInitial}
                     </span>
                 </button>
+
+                <button
+                    type="button"
+                    className={`${styles.navLink} ${styles.logoutButton}`}
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                >
+                    {loggingOut ? 'Saindo...' : 'Sair'}
+                </button>
+
+                {logoutError && (
+                    <p className={styles.logoutError} role="alert">
+                        {logoutError}
+                    </p>
+                )}
 
             </div>
 

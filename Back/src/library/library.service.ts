@@ -1,7 +1,8 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { AddBookDto, CreateShelfDto, LibraryQueryDto, UpdateBookDetailsDto } from './dto/library.dto';
+import { AddBookDto, CreateShelfDto, CreateReadingUpdateDto, LibraryQueryDto, UpdateBookDetailsDto } from './dto/library.dto';
+import { ReadingUpdate } from './entities/reading-update.entity';
 import { Book } from './entities/book.entity';
 import { Shelf } from './entities/shelf.entity';
 import { ReadingStatus, UserBook } from './entities/user-book.entity';
@@ -25,6 +26,24 @@ export class LibraryService {
     try { return await this.shelves.save(this.shelves.create({ userId, name, description: dto.description?.trim() || null })); }
     catch { throw new ConflictException('Você já possui uma estante com este nome.'); }
   }
+  async updateShelf(userId: string, id: string, dto: CreateShelfDto) {
+    const shelf = await this.shelves.findOneBy({ id, userId });
+    if (!shelf) throw new NotFoundException('Estante não encontrada.');
+    const name = dto.name.trim();
+    if (!name) throw new BadRequestException('Informe o nome da estante.');
+    shelf.name = name;
+    if (dto.description !== undefined) shelf.description = dto.description?.trim() || null;
+    try { return await this.shelves.save(shelf); }
+    catch (error) {
+      if (error.code === '23505') throw new ConflictException('Você já possui uma estante com este nome.');
+      throw error;
+    }
+  }
+  async deleteShelf(userId: string, id: string) {
+    const result = await this.shelves.delete({ id, userId });
+    if (!result.affected) throw new NotFoundException('Estante não encontrada.');
+    return { success: true };
+  }
   async addBook(userId: string, dto: AddBookDto) {
     if (!dto.shelfIds.length) throw new BadRequestException('Escolha pelo menos uma estante.');
     const googleBook = await this.googleBooks.findByVolumeId(dto.googleVolumeId);
@@ -35,6 +54,11 @@ export class LibraryService {
     let userBook = await this.userBooks.findOneBy({ userId, bookId: book.id });
     if (!userBook) userBook = this.userBooks.create({ userId, bookId: book.id, status: dto.status });
     else userBook.status = dto.status;
+    if (dto.status === ReadingStatus.READ) {
+      userBook.progress = 100;
+      userBook.readingMode = 'percentage';
+      userBook.readingValue = 100;
+    }
     userBook = await this.userBooks.save(userBook);
     // A relação é cumulativa: adicionar o mesmo título a outra estante não
     // remove as estantes já vinculadas. O status, por outro lado, é único.
@@ -50,7 +74,37 @@ export class LibraryService {
   async updateStatus(userId: string, id: string, status: ReadingStatus) {
     const userBook = await this.userBooks.findOneBy({ id, userId });
     if (!userBook) throw new NotFoundException('Livro não encontrado na sua biblioteca.');
-    userBook.status = status; await this.userBooks.save(userBook);
+    userBook.status = status;
+    if (status === ReadingStatus.READ) {
+      userBook.progress = 100;
+      userBook.readingMode = 'percentage';
+      userBook.readingValue = 100;
+    }
+    await this.userBooks.save(userBook);
+    return this.getLibraryItem(id, userId);
+  }
+  async getReadingUpdates(userId: string, id: string) {
+    const item = await this.userBooks.findOneBy({ id, userId });
+    if (!item) throw new NotFoundException('Livro não encontrado na sua biblioteca.');
+    return this.userBooks.manager.getRepository(ReadingUpdate).find({ where: { userBookId: id }, order: { readDate: 'DESC', createdAt: 'DESC' } });
+  }
+  async createReadingUpdate(userId: string, id: string, dto: CreateReadingUpdateDto) {
+    await this.userBooks.manager.transaction(async (manager) => {
+      const item = await manager.findOne(UserBook, { where: { id, userId }, lock: { mode: 'pessimistic_write' } });
+      if (!item) throw new NotFoundException('Livro não encontrado na sua biblioteca.');
+      const book = await manager.findOneByOrFail(Book, { id: item.bookId });
+      if (dto.mode === 'pages' && !book.pageCount) throw new BadRequestException('Este livro não possui quantidade de páginas informada. Use porcentagem.');
+      const total = dto.mode === 'percentage' ? 100 : book.pageCount!;
+      if (dto.value > total) throw new BadRequestException('O progresso não pode ultrapassar o total do livro.');
+      const progress = dto.value === total ? 100 : Math.min(99, Math.round(dto.value / total * 100));
+      const description = dto.description?.trim() || null;
+      await manager.save(ReadingUpdate, manager.create(ReadingUpdate, { userBookId: id, mode: dto.mode, value: dto.value, progress, readDate: dto.readDate, description }));
+      item.progress = progress; item.readingMode = dto.mode; item.readingValue = dto.value;
+      item.lastReadAt = dto.readDate; item.readingNote = description;
+      if (progress === 100) item.status = ReadingStatus.READ;
+      else if (progress > 0) item.status = ReadingStatus.READING;
+      await manager.save(UserBook, item);
+    });
     return this.getLibraryItem(id, userId);
   }
   async updateDetails(userId: string, id: string, dto: UpdateBookDetailsDto) {

@@ -1,19 +1,25 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AddBookDto, CreateShelfDto, LibraryQueryDto, ShelfAssignmentDto, UpdateBookDetailsDto, UpdateStatusDto } from './dto/library.dto';
+import { AddBookDto, CreateShelfDto, CreateReadingUpdateDto, LibraryQueryDto, ShelfAssignmentDto, UpdateBookDetailsDto, UpdateStatusDto } from './dto/library.dto';
 import { LibraryService } from './library.service';
+import { GutendexService } from './gutendex.service';
 
 type RequestUser = Request & { user: { id: string } };
 @UseGuards(JwtAuthGuard)
 @Controller()
 export class LibraryController {
-  constructor(private readonly library: LibraryService) {}
+  constructor(private readonly library: LibraryService, private readonly gutendex: GutendexService) {}
+  @Get('books/random-quote') randomQuote(@Query('previous') previous?: string) { return this.gutendex.randomQuote(typeof previous === 'string' ? previous.slice(0, 80) : undefined); }
   @Get('books/search') search(@Query('q') query: string) { return this.library.search(query || ''); }
   @Get('shelves') shelves(@Req() req: RequestUser) { return this.library.getShelves(req.user.id); }
   @Post('shelves') createShelf(@Req() req: RequestUser, @Body() dto: CreateShelfDto) { return this.library.createShelf(req.user.id, dto); }
+  @Patch('shelves/:id') updateShelf(@Req() req: RequestUser, @Param('id') id: string, @Body() dto: CreateShelfDto) { return this.library.updateShelf(req.user.id, id, dto); }
+  @Delete('shelves/:id') deleteShelf(@Req() req: RequestUser, @Param('id') id: string) { return this.library.deleteShelf(req.user.id, id); }
   @Get('library') libraryItems(@Req() req: RequestUser, @Query() query: LibraryQueryDto) { return this.library.getLibrary(req.user.id, query); }
   @Post('library') addBook(@Req() req: RequestUser, @Body() dto: AddBookDto) { return this.library.addBook(req.user.id, dto); }
+  @Get('library/:id/reading-updates') readingUpdates(@Req() req: RequestUser, @Param('id') id: string) { return this.library.getReadingUpdates(req.user.id, id); }
+  @Post('library/:id/reading-updates') createReadingUpdate(@Req() req: RequestUser, @Param('id') id: string, @Body() dto: CreateReadingUpdateDto) { return this.library.createReadingUpdate(req.user.id, id, dto); }
   @Patch('library/:id/status') updateStatus(@Req() req: RequestUser, @Param('id') id: string, @Body() dto: UpdateStatusDto) { return this.library.updateStatus(req.user.id, id, dto.status); }
   @Patch('library/:id') updateDetails(@Req() req: RequestUser, @Param('id') id: string, @Body() dto: UpdateBookDetailsDto) { return this.library.updateDetails(req.user.id, id, dto); }
   @Post('library/:id/shelves') addToShelf(@Req() req: RequestUser, @Param('id') id: string, @Body() dto: ShelfAssignmentDto) { return this.library.addToShelf(req.user.id, id, dto.shelfId); }

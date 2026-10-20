@@ -12,9 +12,11 @@ import Profile from '../pages/Profile/Profile';
 import AuthCallback from '../pages/AuthCallback/AuthCallback';
 import Catalog from '../pages/Catalog/Catalog';
 import Library from '../pages/Library/Library';
+import Quotations from '../pages/Quotations/Quotations';
 
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
+import Footer from '../components/Footer/Footer';
 
 function AppRoutes() {
   return (
@@ -52,6 +54,7 @@ function AppRoutes() {
           />
 
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/quotations" element={<Quotations />} />
           <Route path="/shelves/books" element={<Library />} />
           <Route path="/journey/read" element={<Library />} />
           <Route path="/journey/reading" element={<Library />} />
@@ -61,6 +64,7 @@ function AppRoutes() {
         </Route>
 
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }

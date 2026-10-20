@@ -46,7 +46,7 @@ export class AuthController {
 
   @Post('logout')
   logout(@Res({ passthrough: true }) response: Response) {
-    response.clearCookie('andarna_session', { httpOnly: true, sameSite: 'lax', secure: this.isProduction() });
+    response.clearCookie('andarna_session', { httpOnly: true, sameSite: 'lax', secure: this.isProduction(), path: '/' });
     return { message: 'Sessão encerrada.' };
   }
 

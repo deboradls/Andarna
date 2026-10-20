@@ -201,72 +201,57 @@
 .filters {
   position: relative;
   z-index: 1;
-
   width: calc(100% - 80px);
   max-width: 1400px;
-
   margin: 0 auto 42px;
-
   display: flex;
-
-  align-items: center;
-
-  gap: 7px;
-
-  padding-bottom: 13px;
-
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.055);
 }
 
-.filters::before {
-  content: "ESTANTES";
-
-  margin-right: 10px;
-
-  color: #58687b;
-
-  font-size: 0.54rem;
-
-  font-weight: 700;
-
-  letter-spacing: 0.17em;
+.statusFilter,
+.searchFilter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #8996a6;
+  font-size: 0.72rem;
+  min-width: 0;
 }
 
-.filters a {
-  position: relative;
+.statusFilter {
+  flex: 0 1 220px;
+}
 
-  padding: 7px 12px;
+.searchFilter {
+  flex: 1 1 280px;
+}
 
-  border: 1px solid transparent;
-
+.filters select,
+.filters input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(207, 148, 54, 0.25);
   border-radius: 6px;
-
-  color: #728095;
-
-  font-size: 0.67rem;
-
-  text-decoration: none;
-
-  transition:
-    color 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
+  background: #0a192d;
+  color: #e7e2d9;
+  font: inherit;
 }
 
-.filters a:hover {
-  color: #cf9436;
-
-  background: rgba(207, 148, 54, 0.05);
+.filters input::placeholder {
+  color: #8996a6;
 }
 
-.filters a.active {
-  border-color: rgba(207, 148, 54, 0.22);
-
-  background: rgba(207, 148, 54, 0.08);
-
-  color: #cf9436;
+.filters select:focus-visible,
+.filters input:focus-visible {
+  outline: 2px solid #cf9436;
+  outline-offset: 2px;
 }
-
 /* =========================================
    ERRO
 ========================================= */
@@ -337,7 +322,11 @@
     0 15px 40px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.02);
 
-  overflow: hidden;
+  overflow: visible;
+}
+
+.shelf:focus-within {
+  z-index: 3;
 }
 
 .shelf::before {
@@ -376,7 +365,91 @@
    CABEÇALHO DA ESTANTE
 ========================================= */
 
+.shelfActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.shelfMenuContainer {
+  position: relative;
+}
+
+.shelfMenuButton {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(207, 148, 54, 0.25);
+  border-radius: 6px;
+  background: #0a192d;
+  color: #d9a249;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.shelfDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 5;
+  width: 180px;
+  padding: 6px;
+  border: 1px solid rgba(207, 148, 54, 0.25);
+  border-radius: 8px;
+  background: #10243d;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.shelfDropdown button {
+  width: 100%;
+  padding: 11px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #eee9df;
+  font: inherit;
+  font-size: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.shelfDropdown button:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.shelfDropdown .dangerAction,
+.createShelfForm > .dangerAction {
+  color: #ff9292;
+  border-color: rgba(230, 85, 85, 0.45);
+  background: rgba(160, 40, 40, 0.15);
+}
+
+.shelfDialogHelp {
+  margin: 0;
+  color: #8996a6;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.shelfDialogError {
+  margin: 0;
+  color: #ff9292;
+  font-size: 0.8rem;
+}
+
+.shelfActions button:focus-visible {
+  outline: 2px solid #cf9436;
+  outline-offset: 2px;
+}
+
+.createShelfForm button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .shelf > header {
+  position: relative;
+  z-index: 2;
   display: flex;
 
   align-items: center;
@@ -495,6 +568,7 @@
 ========================================= */
 
 .bookTile {
+  cursor: default;
   position: relative;
 
   min-width: 0;
@@ -512,13 +586,114 @@
       rgba(11, 28, 48, 0.7)
     );
 
-  cursor: pointer;
-
   transition:
     transform 0.22s ease,
     border-color 0.22s ease,
     background 0.22s ease,
     box-shadow 0.22s ease;
+}
+
+.bookTileOpen {
+  z-index: 4;
+}
+
+.bookCoverButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.bookCoverButton:focus-visible,
+.bookDropdown button:focus-visible {
+  outline: 2px solid #cf9436;
+  outline-offset: 3px;
+}
+
+.bookDropdown {
+  position: absolute;
+  top: calc(100% - 6px);
+  left: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(100vw - 48px);
+  padding: 6px;
+  border: 1px solid rgba(207, 148, 54, 0.25);
+  border-radius: 8px;
+  background: #10243d;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.bookTile:last-child .bookDropdown {
+  left: auto;
+  right: 0;
+}
+
+.bookDropdown button {
+  display: block;
+  width: 100%;
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #eee9df;
+  font: inherit;
+  font-size: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bookDropdown button:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.bookDropdown .dangerAction,
+.progressForm > .dangerAction {
+  color: #ff9292;
+  border-color: rgba(230, 85, 85, 0.45);
+  background: rgba(160, 40, 40, 0.15);
+}
+
+.progressForm button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.readingHistory {
+  display: grid;
+  gap: 14px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.readingHistory li {
+  padding: 14px;
+  border: 1px solid rgba(207, 148, 54, 0.2);
+  border-radius: 8px;
+}
+
+.readingHistory time,
+.readingHistory strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+.readingHistory time {
+  color: #cf9436;
+}
+
+.readingHistory p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #b9c1cc;
+  line-height: 1.6;
 }
 
 .bookTile:hover {
@@ -1222,6 +1397,26 @@
   background: rgba(4, 15, 29, 0.9);
 }
 
+.progressInputRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progressInputRow input {
+  flex: 1;
+  min-width: 0;
+}
+
+.pageTotal {
+  flex: 0 1 auto;
+  max-width: 45%;
+  color: #b9c1cc;
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
 .createShelfForm textarea,
 .progressForm textarea {
   min-height: 90px;
@@ -1442,24 +1637,9 @@
     align-self: flex-start;
   }
 
-  .filters {
-    overflow-x: auto;
-
-    padding-bottom: 10px;
-
-    scrollbar-width: none;
-  }
-
-  .filters::-webkit-scrollbar {
-    display: none;
-  }
-
-  .filters::before {
-    flex-shrink: 0;
-  }
-
-  .filters a {
-    flex-shrink: 0;
+  .statusFilter,
+  .searchFilter {
+    flex: 1 1 100%;
   }
 
   .shelf {
@@ -1505,9 +1685,7 @@
     font-size: 0.76rem;
   }
 
-  .filters::before {
-    display: none;
-  }
+
 
   .shelf {
     padding: 15px;
@@ -1547,3 +1725,95 @@
     font-size: 1.35rem;
   }
 }
+
+/* Coleção pessoal — mesma direção visual do catálogo. */
+.page { padding: 42px 0 80px; background: radial-gradient(ellipse at 75% 0%, rgba(207,148,54,.07), transparent 38%), #071426; }
+.page::before, .page::after { display: none; }
+.pageHeader, .filters, .shelfGrid, .empty, .error, .overview, .collectionHeading, .loadingState { width: calc(100% - 64px); max-width: 1240px; }
+.pageHeader { align-items: center; gap: 48px; min-height: 290px; margin-bottom: 34px; }
+.pageHeader > div:first-child { max-width: 650px; }
+.pageHeader h1 { margin: 10px 0 18px; font-family: Georgia, serif; font-size: clamp(2.7rem, 4.8vw, 4.5rem); font-weight: 400; line-height: 1.08; letter-spacing: -.045em; }
+.pageHeader h1 em { color: #dba54c; font-weight: 400; }
+.pageHeader > div > p:last-child { margin-top: 0; }
+.pageHeader > div > p { max-width: 510px; color: #a1adbd; font-size: .86rem; line-height: 1.85; }
+.pageHeader .eyebrow, .eyebrow { color: #cf9436; font-size: .64rem; letter-spacing: .16em; }
+.headerActions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 24px; }
+.createButton { padding: 12px 18px; background: #cf9436; color: #071426; border-color: #cf9436; font-size: .76rem; border-radius: 7px; }
+.createButton::before { border-color: rgba(7,20,38,.35); }
+.createButton:hover { background: #e7af52; border-color: #e7af52; }
+.exploreLink { display: inline-flex; align-items: center; gap: 16px; color: #c5b28f; font-size: .75rem; }
+.exploreLink:hover { color: #f3bd42; }
+.collectionArt { position: relative; display: flex; flex: 0 0 330px; justify-content: center; align-items: center; height: 260px; isolation: isolate; }
+.artOrbit { position: absolute; width: 235px; height: 235px; border: 1px dashed rgba(207,148,54,.18); border-radius: 50%; }
+.artStar { position: absolute; top: 0; right: 35px; color: #cf9436; font-size: 1.7rem; }
+.artVolumes { display: flex; align-items: flex-end; gap: 8px; height: 155px; padding-bottom: 0; }
+.artVolumes i { position: relative; display: grid; place-items: center; width: 42px; height: 142px; border: 1px solid rgba(207,148,54,.3); border-radius: 4px 4px 0 0; background: #234b50; color: #e7cf9e; font: normal .5rem Georgia, serif; letter-spacing: .17em; writing-mode: vertical-rl; box-shadow: inset 5px 0 0 rgba(0,0,0,.14), 8px 10px 20px rgba(0,0,0,.25); }
+.artVolumes i::after { position: absolute; bottom: 12px; content: '✦'; font-size: .65rem; }
+.artVolumes i:nth-child(2) { height: 170px; width: 45px; background: #795639; }
+.artVolumes i:nth-child(3) { height: 150px; background: #384054; }
+.artVolumes i:nth-child(4) { height: 160px; margin-left: 8px; transform: rotate(12deg); transform-origin: bottom; background: #6a3d3d; }
+.artShelf { position: absolute; bottom: 49px; width: 285px; height: 7px; border: 1px solid rgba(207,148,54,.25); border-radius: 2px; background: #685032; box-shadow: 0 14px 22px rgba(0,0,0,.35); }
+.collectionArt > p { position: absolute; bottom: 11px; margin: 0; color: #8c9aad; font: italic .78rem Georgia, serif; }
+.overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 0 auto 28px; padding: 22px 0; border: 1px solid rgba(207,148,54,.16); border-radius: 12px; background: linear-gradient(110deg, #10243b, #0c1c30); }
+.overview > div { display: flex; align-items: center; gap: 16px; padding: 0 24px; border-right: 1px solid rgba(255,255,255,.08); }
+.overview > div:last-child { border-right: 0; }
+.overviewIcon { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border: 1px solid rgba(207,148,54,.2); border-radius: 8px; color: #dba54c; font-size: 1.1rem; }
+.overview strong { display: block; margin-bottom: 5px; color: #eee9df; font: 1.65rem Georgia, serif; }
+.overview > div > div > span { color: #a1adbd; font-size: .67rem; }
+.filters { align-items: flex-end; gap: 18px; margin-bottom: 36px; padding: 20px 22px; border: 1px solid rgba(255,255,255,.08); border-radius: 12px; background: rgba(13,30,53,.6); }
+.statusFilter, .searchFilter { font-size: .69rem; color: #a1adbd; }
+.statusFilter { flex: 0 1 240px; }
+.filters select, .filters input { min-height: 48px; padding: 12px 14px; border-color: rgba(255,255,255,.12); background: #071626; font-size: .8rem; }
+.collectionHeading { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin: 0 auto 22px; }
+.collectionHeading .eyebrow { margin-bottom: 9px; }
+.collectionHeading h2 { color: #eee9df; font: 400 1.7rem Georgia, serif; }
+.collectionHeading > span { color: #8c9aad; font-size: .7rem; text-align: right; }
+.shelfGrid { gap: 28px; }
+.shelf { padding: 24px; border-color: rgba(255,255,255,.09); background: #0b1c30; border-radius: 14px; }
+.shelf::after { display: none; }
+.shelf > header { gap: 20px; margin-bottom: 24px; padding-bottom: 20px; }
+.shelfIdentity { display: flex; align-items: flex-start; gap: 16px; }
+.shelf header .shelfNumber { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border: 1px solid rgba(207,148,54,.2); border-radius: 8px; background: rgba(207,148,54,.04); color: #dba54c; font: 1.05rem Georgia, serif; }
+.shelf h2 { color: #eee9df; font-size: 1.5rem; overflow-wrap: anywhere; }
+.shelf header p { margin-top: 6px; color: #98a7b9; font-size: .75rem; line-height: 1.6; overflow-wrap: anywhere; }
+.shelf header span { display: inline-block; margin-top: 5px; color: #9eacbd; font-size: .65rem; }
+.shelf header .shelfNumber { margin-top: 0; }
+.addBookButton { padding: 10px 14px; color: #dfb26b; font-size: .7rem; }
+.shelfMenuButton { width: 38px; height: 38px; background: transparent; }
+.tiles { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; }
+.bookTile { padding: 0; border-color: rgba(255,255,255,.08); border-radius: 10px; background: #102237; }
+.bookTile:hover { transform: translateY(-3px); border-color: rgba(207,148,54,.35); background: #102237; box-shadow: 0 12px 24px rgba(0,0,0,.2); }
+.bookCoverButton { border-radius: 10px; overflow: hidden; text-align: left; }
+.tileStage { position: relative; display: grid; place-items: center; padding: 22px 16px; height: 212px; background: radial-gradient(ellipse at 50% 80%, #2b3d4b, #172a3c); }
+.bookTile:nth-child(3n + 2) .tileStage { background: radial-gradient(ellipse at 50% 80%, #3c3d37, #252c32); }
+.bookTile:nth-child(3n) .tileStage { background: radial-gradient(ellipse at 50% 80%, #28413f, #162d32); }
+.tileCover { width: 112px; height: 168px; aspect-ratio: 2 / 3; margin: 0; border-radius: 2px 5px 5px 2px; background: #17353f; color: #e2c58f; box-shadow: 8px 10px 16px rgba(0,0,0,.4); }
+.tileCover img { object-fit: cover; }
+.coverTitle { display: flex; flex-direction: column; justify-content: space-around; align-items: center; height: 100%; padding: 14px 10px; border: 1px solid rgba(207,148,54,.35); font: .85rem Georgia, serif; line-height: 1.5; }
+.coverTitle i { font-style: normal; }
+.bookOptionsHint { position: absolute; right: 10px; top: 10px; width: 25px; height: 25px; border: 1px solid rgba(255,255,255,.15); border-radius: 50%; color: #e5dccb; font-size: 1.1rem; text-align: center; line-height: 19px; }
+.tileInfo { padding: 16px; }
+.readingBadge { display: inline-block; margin-bottom: 9px; padding: 4px 7px; border: 1px solid rgba(207,148,54,.2); border-radius: 4px; background: rgba(207,148,54,.06); color: #e0b16a; font-size: .57rem; }
+.completedBadge { color: #a3c9b5; border-color: rgba(127,180,154,.25); background: rgba(127,180,154,.06); }
+.bookTile h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-height: 2.7em; margin: 0; color: #eee6d9; font: 400 1rem/1.35 Georgia, serif; white-space: normal; }
+.tileInfo > p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; min-height: 2.9em; margin-top: 6px; color: #a1adbd; font-size: .68rem; line-height: 1.45; }
+.tileProgress { display: flex; justify-content: space-between; gap: 8px; margin-top: 15px; color: #94a4b6; font-size: .58rem; }
+.tileProgress strong { color: #d7b782; font-weight: 500; }
+.tileProgressTrack { height: 3px; margin-top: 8px; overflow: hidden; border-radius: 8px; background: rgba(255,255,255,.09); }
+.tileProgressTrack > span { display: block; height: 100%; border-radius: inherit; background: #cf9436; }
+.bookDropdown { top: calc(100% + 6px); width: max(100%, 185px); }
+.emptyShelf { padding: 32px 20px; border-color: rgba(207,148,54,.13); background: rgba(207,148,54,.02); font-style: normal; }
+.emptyShelf > span { display: block; margin-bottom: 12px; color: #dba54c; font-size: 1.8rem; }
+.emptyShelf p { color: #a1adbd; font: 1.1rem Georgia, serif; }
+.emptyShelf a { display: inline-block; margin-top: 14px; color: #dfb26b; font: .72rem var(--font-body); }
+.empty { padding: 44px 24px; background: #0b1c30; font-style: normal; }
+.empty h3 { color: #eee9df; font: 1.5rem Georgia, serif; }
+.empty p { margin: 12px auto 20px; color: #a1adbd; font: .82rem/1.7 var(--font-body); }
+.empty button { padding: 11px 16px; border: 1px solid rgba(207,148,54,.3); border-radius: 6px; background: rgba(207,148,54,.08); color: #dfb26b; font-size: .75rem; }
+.loadingState { margin: 0 auto 24px; color: #a1adbd; font-size: .85rem; }
+.error { margin: 0 auto 24px; }
+.headerActions a:focus-visible, .headerActions button:focus-visible, .empty a:focus-visible, .empty button:focus-visible, .emptyShelf a:focus-visible { outline: 2px solid #cf9436; outline-offset: 4px; }
+@media (max-width: 1000px) { .pageHeader, .filters, .shelfGrid, .empty, .error, .overview, .collectionHeading, .loadingState { width: calc(100% - 40px); } .collectionArt { flex-basis: 280px; transform: scale(.9); } .pageHeader { gap: 20px; } .overview > div { gap: 10px; padding: 0 16px; } .tiles { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); } }
+@media (max-width: 700px) { .page { padding-top: 30px; } .pageHeader { min-height: 0; flex-direction: column; align-items: flex-start; margin-bottom: 28px; } .collectionArt { display: none; } .pageHeader h1 { font-size: 3.1rem; } .overview { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; } .overview > div:nth-child(2) { border-right: 0; } .filters { padding: 18px; } .statusFilter, .searchFilter { flex: 1 1 100%; } .shelf { padding: 18px; } .shelf > header { align-items: flex-start; flex-direction: column; } .shelfActions { align-self: stretch; justify-content: flex-end; } .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; } .collectionHeading h2 { font-size: 1.5rem; } .collectionHeading > span { max-width: 120px; line-height: 1.5; } .tileStage { height: 198px; } .tileCover { width: 102px; height: 153px; } }
+@media (max-width: 420px) { .pageHeader, .filters, .shelfGrid, .empty, .error, .overview, .collectionHeading, .loadingState { width: calc(100% - 28px); } .pageHeader h1 { font-size: 2.7rem; } .overview > div { gap: 8px; padding: 0 12px; } .overviewIcon { flex-basis: 30px; width: 30px; height: 30px; } .overview > div > div > span { font-size: .58rem; } .shelf { padding: 14px; } .tiles { gap: 10px; } .tileStage { height: 171px; padding: 16px 10px; } .tileCover { width: 88px; height: 132px; } .tileInfo { padding: 12px; } .bookTile h3 { font-size: .88rem; } .tileInfo > p { font-size: .62rem; } .shelfIdentity { gap: 12px; } .shelf h2 { font-size: 1.3rem; } .bookDropdown { width: 100%; } .bookDropdown button { padding: 11px 8px; font-size: .67rem; } }
+@media (prefers-reduced-motion: reduce) { .bookTile, .tileCover img, .createButton { transition: none; } .bookTile:hover, .bookTile:hover .tileCover img, .createButton:hover { transform: none; } }

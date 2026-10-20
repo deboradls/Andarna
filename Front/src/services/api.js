@@ -20,8 +20,17 @@ export const authApi = {
 };
 
 export const libraryApi = {
+  quotations: () => request('/quotations'),
+  createQuotation: (data) => request('/quotations', { method: 'POST', body: JSON.stringify(data) }),
+  updateQuotation: (id, data) => request(`/quotations/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteQuotation: (id) => request(`/quotations/${id}`, { method: 'DELETE' }),
   searchBooks: (query) => request(`/books/search?q=${encodeURIComponent(query)}`),
   shelves: () => request('/shelves'),
+  randomQuote: (previous = '') => request(`/books/random-quote?${new URLSearchParams({ previous })}`),
+  readingUpdates: (id) => request(`/library/${id}/reading-updates`),
+  createReadingUpdate: (id, data) => request(`/library/${id}/reading-updates`, { method: 'POST', body: JSON.stringify(data) }),
+  updateShelf: (id, data) => request(`/shelves/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteShelf: (id) => request(`/shelves/${id}`, { method: 'DELETE' }),
   createShelf: (data) => request('/shelves', { method: 'POST', body: JSON.stringify(typeof data === 'string' ? { name: data } : data) }),
   library: (params = {}) => request(`/library?${new URLSearchParams(params)}`),
   addBook: (payload) => request('/library', { method: 'POST', body: JSON.stringify(payload) }),
